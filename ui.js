@@ -10,6 +10,8 @@ $(async function() {
 
   const $navSubmit = $("#nav-submit");
   const $submitForm = $("#submit-form");
+  const $navFavorites = $("#nav-favorites");
+  const $favoritedArticles = $("#favorited-articles");
 
   // global storyList variable
   let storyList = null;
@@ -72,7 +74,7 @@ $(async function() {
     const username = currentUser.username;
     const author = $("#author").val();
 
-    const storyObj = await storyList.addStory(currentUser, {
+    const storyObject = await storyList.addStory(currentUser, {
       title,
       author,
       url,
@@ -82,7 +84,7 @@ $(async function() {
     const $li = $(`
       <li id="${storyObject.storyId}" class="id-${storyObject.storyId}">
         <span class="star">
-          <i class="far fa-star" />
+        <i class="far fa-star"></i>
         </span>
         <a class="article-link" href="${url}" target="a_blank">
           <strong>${title}</strong>
@@ -93,6 +95,8 @@ $(async function() {
       </li>`);
 
     $allStoriesList.prepend($li);
+    $submitForm.hide();
+    // $submitForm.trigger("reset");
   });
 
   $navLogOut.on("click", function() {
@@ -196,6 +200,9 @@ $(async function() {
     // render story markup
     const storyMarkup = $(`
       <li id="${story.storyId}">
+      <span class="star">
+        <i class="far fa-star"></i>
+        </span>
         <a class="article-link" href="${story.url}" target="a_blank">
           <strong>${story.title}</strong>
         </a>
@@ -204,17 +211,51 @@ $(async function() {
         <small class="article-username">posted by ${story.username}</small>
       </li>
     `);
-
     return storyMarkup;
   }
 
   $navSubmit.on("click", function() {
     if (currentUser) {
       hideElements();
-      //allStoriesList()
+      $allStoriesList.show();
       $submitForm.slideToggle();
     }
   });
+
+ 
+  
+  $(".star").on("click", ".fas, .far", function(e) {
+    $(e.target).toggleClass("fas far");
+
+    currentUser.addFavorite
+
+  });
+
+  $navFavorites.on("click", function() {
+    // if (currentUser) {
+    //   hideElements();
+    //   // $favoritedArticles.show();
+    // }
+
+      // $(".star")
+      //   .children()
+      //   .not(".fas")
+      //   .parent()
+      //   .parent()
+      //   .hide();
+
+
+      
+  });
+
+
+
+localStorage.setItem("favorites", localStorage.setItem("favorites", JSON.stringify($(".star")
+        .children()
+        .not(".far")
+        .parent()
+        .parent())))
+
 
   /* hide all elements in elementsArr */
 

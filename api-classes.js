@@ -62,7 +62,7 @@ class StoryList {
     // add newstory to the front of the list array
     this.stories.unshift(newStory);
     // add new story to the fornt of user array
-    this.ownStories.unshift(newStory);
+    user.ownStories.unshift(newStory);
     return newStory;
   }
 }
