@@ -12,6 +12,7 @@ $(async function() {
   const $submitForm = $("#submit-form");
   const $navFavorites = $("#nav-favorites");
   const $favoritedArticles = $("#favorited-articles");
+  const $navMyStories = $("#nav-mystories")
 
   // global storyList variable
   let storyList = null;
@@ -190,6 +191,54 @@ $(async function() {
     }
   }
 
+  function generateFaves() {
+    $favoritedArticles.empty();
+
+    if (currentUser.favorites.length === 0) {
+      $favoritedArticles.append("<h1>No favorities added! </h1>");
+    } else {
+      for (let story of currentUser.favorites) {
+        let favoriteHTML = generateFavHTML(story);
+        $favoritedArticles.append(favoriteHTML);
+      }
+    }
+  }
+
+  function generateMyStories() {
+    $ownStories.empty();
+
+    if (currentUser.ownStories.length === 0) {
+      $ownStories.append("<h1>No Stories added! </h1>");
+    } else {
+      for (let story of currentUser.ownStories) {
+        let ownStoriesHTML = generateOwnHTML(story);
+        $ownStories.append(ownStoriesHTML);
+      }
+    }
+  }
+
+
+
+  function generateFavHTML(story) {
+    let hostName = getHostName(story.url);
+
+    // render story markup
+    const storyMarkup = $(`
+        <li id="${story.storyId}">
+        <span class="star">
+          <i class="fas fa-star"></i>
+          </span>
+          <a class="article-link" href="${story.url}" target="a_blank">
+            <strong>${story.title}</strong>
+          </a>
+          <small class="article-author">by ${story.author}</small>
+          <small class="article-hostname ${hostName}">(${hostName})</small>
+          <small class="article-username">posted by ${story.username}</small>
+        </li>
+      `);
+    return storyMarkup;
+  }
+
   /**
    * A function to render HTML for an individual Story instance
    */
@@ -214,6 +263,54 @@ $(async function() {
     return storyMarkup;
   }
 
+  function generateOwnHTML(story) {
+    let hostName = getHostName(story.url);
+
+    // render story markup
+    const storyMarkup = $(`
+      <li id="${story.storyId}">
+        <span class="trash">
+        <i class="fa fa-trash"></i>
+        </span>
+         <span class="star">
+        <i class="far fa-star"></i>
+        </span>
+        <a class="article-link" href="${story.url}" target="a_blank">
+          <strong>${story.title}</strong>
+        </a>
+        <small class="article-author">by ${story.author}</small>
+        <small class="article-hostname ${hostName}">(${hostName})</small>
+        <small class="article-username">posted by ${story.username}</small>
+      </li>
+    `);
+    return storyMarkup;
+  }
+
+
+  $(".articles-container").on("click", ".trash", async function(evt) {
+    if (currentUser) {
+      const $evttarget = $(evt.target);
+      const storyId = $evttarget.closest("li").attr("id");
+
+      if ($evttarget.hasClass("fa-trash")) {
+        await currentUser.removeOwn(storyId);
+        
+      } 
+
+
+      // $(".trash")
+      //   .parent()
+      //   .hide()
+        
+          // $(".star")
+    //   .children()
+    //   .not(".fas")
+    //   .parent()
+    //   .parent()
+    //   .hide();
+    }
+  });
+
   $navSubmit.on("click", function() {
     if (currentUser) {
       hideElements();
@@ -222,46 +319,57 @@ $(async function() {
     }
   });
 
- 
-  
-  $(".star").on("click", ".fas, .far", function(e) {
-    $(e.target).toggleClass("fas far");
+  // $(".star").on("click", ".fas, .far", function(e) {
+  //   $(e.target).toggleClass("fas far");
 
-    currentUser.addFavorite
+  // });
 
+  $(".articles-container").on("click", ".star", async function(evt) {
+    if (currentUser) {
+      const $evttarget = $(evt.target);
+      const storyId = $evttarget.closest("li").attr("id");
+
+      if ($evttarget.hasClass("fas")) {
+        await currentUser.removeFavorite(storyId);
+        $evttarget.closest("i").toggleClass("fas far");
+      } else {
+        // console.log("what is happening?")
+        await currentUser.addFavorite(storyId);
+        $evttarget.closest("i").toggleClass("fas far");
+      }
+    }
   });
 
   $navFavorites.on("click", function() {
-    // if (currentUser) {
-    //   hideElements();
-    //   // $favoritedArticles.show();
-    // }
-
-      // $(".star")
-      //   .children()
-      //   .not(".fas")
-      //   .parent()
-      //   .parent()
-      //   .hide();
-
-
-      
+    if (currentUser) {
+      hideElements();
+      generateFaves();
+      $favoritedArticles.show();
+    }
+    // $(".star")
+    //   .children()
+    //   .not(".fas")
+    //   .parent()
+    //   .parent()
+    //   .hide();
   });
 
+  $navMyStories.on("click", function(){
+   
+    if(currentUser){
+      hideElements();
+      generateMyStories();
+      $ownStories.show();
+    }
 
-
-localStorage.setItem("favorites", localStorage.setItem("favorites", JSON.stringify($(".star")
-        .children()
-        .not(".far")
-        .parent()
-        .parent())))
-
+  })
 
   /* hide all elements in elementsArr */
 
   function hideElements() {
     const elementsArr = [
       $submitForm,
+      $favoritedArticles,
       $allStoriesList,
       $filteredArticles,
       $ownStories,

@@ -171,6 +171,42 @@ class User {
     existingUser.ownStories = response.data.user.stories.map(s => new Story(s));
     return existingUser;
   }
+
+  async addFavorite(storyID) {
+    let response = await axios.post(
+      `${BASE_URL}/users/${this.username}/favorites/${storyID}`,
+      { token: this.loginToken }
+    );
+
+    this.favorites = response.data.user.favorites.map(
+      story => new Story(story)
+    );
+  }
+
+  async removeFavorite(storyID) {
+    let response = await axios.delete(
+      `${BASE_URL}/users/${this.username}/favorites/${storyID}`,
+      { data: { token: this.loginToken } }
+    );
+    this.favorites = response.data.user.favorites.map(
+      story => new Story(story)
+    );
+  }
+
+  async removeOwn(storyID) {
+    let response = await axios.delete(`${BASE_URL}/stories/${storyID}`, {
+      data: { token: this.loginToken }
+    });
+    console.log(this.ownStories);
+
+    console.log(response.data.story.storyId);
+
+    let idx = this.ownStories.findIndex(function(el) {
+      return el.storyId === response.data.story.storyId;
+    });
+    console.log(idx);
+    this.ownStories.splice(idx, 1);
+  }
 }
 
 /**
